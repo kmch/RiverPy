@@ -1,7 +1,8 @@
 from autologging import logged, traced
-import sys
-sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch') 
-import sample_network_unmix as snu
+# import sys
+# sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch') 
+# import sample_network_unmix as snu
+import funmixer.network_unmixer as snu
 
 class SolverForward:
   pass
