@@ -1,6 +1,6 @@
 package:
   name: riverpy
-  version: "0.0.1"  # Adjust the version number as needed
+  version: "0.1.1"  # Adjust the version number as needed
 
 source:
   path: .  # Assuming the source code is in the current directory
@@ -15,8 +15,6 @@ requirements:
   run:
     - python
     - autologging
-    # - matplotlib
-    # - numpy    
 
 extra:
   channels:
