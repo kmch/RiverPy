@@ -21,7 +21,7 @@ import subprocess
 import urllib.request
 
 import autocatchments as ac
-from compysitional.pca import CompositionalPCA
+# from compysitional.pca import CompositionalPCA
 from iogeo.api import read 
 from plotea.mpl2d import *
 

@@ -10,7 +10,7 @@ Inversion framework. The canonical sequence of steps is the following:
 """
 #FIXME: move to plot!
 import cmocean as cm 
-import colorcet as cc
+# import colorcet as cc
 from matplotlib.colors import LogNorm
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
