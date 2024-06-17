@@ -31,11 +31,13 @@ from riverpy.ioapi import *
 from riverpy.plot import *
 from riverpy.utils import round2accuracy, sort
 
-import sys
-sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch') 
-import sample_network_unmix as snu
-sys.path.append('/Users/kmc3817/postdoc/alex/thames-sewage')
-from sewage import get_current_discharge_status
+import funmixer.network_unmixer as snu
+
+# import sys
+# sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch') 
+# import sample_network_unmix as snu
+# sys.path.append('/Users/kmc3817/postdoc/alex/thames-sewage')
+# from sewage import get_current_discharge_status
 
 @logged
 class Geospatial:

@@ -25,10 +25,12 @@ from riverpy.coords import convert_xy_to_ij
 from riverpy.input import *
 from riverpy.solver import SolverForwardFunmixer #, SolverInverseFunmixer #FIXME
 from riverpy.utils import sort
-import sys
-sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch') 
+# import sys
+# sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch') 
 # sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch/build') 
-import sample_network_unmix as snu #FIXME
+# import sample_network_unmix as snu #FIXME
+import funmixer.network_unmixer as snu
+
 from scipy.ndimage import gaussian_filter #FIXME
 
 @logged
