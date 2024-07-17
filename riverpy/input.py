@@ -524,6 +524,22 @@ class DatasetICL(Geospatial):
     return extent
 @logged
 class DataSamples(Geospatial):
+  """
+  DataSamples is a geospatial object 
+  that assignes certain values (e.g. measured concentrations / 
+  their uncertainty / ...) to spatial coordinates.
+
+  These samples can be relocated, clustered or
+  processed in various other ways.
+
+  The data is stored as a DataFrame, as well as dict and list
+  of `DataSample` objects.
+
+  Parameters
+  ----------
+  Geospatial : _type_
+      _description_
+  """
   def __init__(self, df: pd.DataFrame, data_cols=[], dataset=None):
     self.dataset = dataset
     self.df = df
