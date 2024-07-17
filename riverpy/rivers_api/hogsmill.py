@@ -1,13 +1,14 @@
 from dataclasses import dataclass, field
+from riverpy.rivers_api.base import ParamsBase
 from typing import Dict, List, Optional
 
 @dataclass
-class ParamsHogsmill:
+class ParamsHogsmill(ParamsBase):
   """    
   Usage
-  >>>ph = ParamsHogsmill()
-  >>>print(ph)
-  >>>print(ph.relocate_dict)
+  >>> params = ParamsHogsmill()
+  >>> print(params)
+  >>> print(params.relocate_dict)
   """
   thresh: float = 1e6
   use_letters: bool = True
@@ -15,8 +16,6 @@ class ParamsHogsmill:
     6: [520500, 164300],
     9: [None, 163400],
   })
-
-
 
 
 # DomainHogsmill
