@@ -95,75 +95,75 @@ class PlotGeospatial(AxesFormatter):
 
 # Figures ------------------------------------------------------------------------------
 
-def plot_multichem(chem):
-  def add_subfigure_label(ax, label, pos='tl', fontsize=20, c='w'):
-      y2 = 0.98
-      if pos == 'tl':
-        pos = [0.03, y2]
-      elif pos == 'tr':
-        pos = [y2, y2]
-      elif pos == 'br':
-        pos = [y2, 0.08]
-      elif pos == 'bl':
-        pos = [0.03, 0.08]
-      else:
-        pass
-      ax.text(*pos, label, transform=ax.transAxes, c=c,
-              fontsize=fontsize, va='top')
-      return ax
-    kws = dict(samples=0, graph=0, catch=1, rivers=0, wtws=0, drain=1, csos=0)
-    kwsd = dict(column=chem, vmin=cmin, vmax=cmax, rotate_ylabels=1, 
-                s=400, marker='o', zorder=15,
-                annotate='id', annotate_kw=dict(c='w', xytext=(0,-3)),)
-    fig = plt.figure(figsize=(13,7))
-    gs = gridspec.GridSpec(10,4, width_ratios=[2,1.4,1,0.5])
-    # --------------------------------
-    ax = fig.add_subplot(gs[:,0])
-    ax = ps.plot(ax=ax, **kws)
-    ax = dobs.plot(ax=ax, **kwsd)
-    Domain(*Geospatial().get_extent_zoom(*zoom1)).plot(ax=ax, c='w')
-    Domain(*Geospatial().get_extent_zoom(*zoom2)).plot(ax=ax, c='w')
-    add_subfigure_label(ax, 'a', pos=[0.03, 0.99])
-    # --------------------------------
-    ax = fig.add_subplot(gs[:4,1])
-    ax = ps.plot(ax=ax, zoom=zoom1, labels=0, ticklabels=1, **kws)
-    ax = dobs.plot(ax=ax, labels=0, ticklabels=1, **kwsd)
-    #     plt.xticks([525000,527000], [525,527])
-    #     plt.yticks([173000,175000], [173,175])
-    add_subfigure_label(ax, 'b', pos='tl')
-    # --------------------------------
-    ax = fig.add_subplot(gs[5:-1,1])
-    ax = ps.plot(ax=ax, zoom=zoom2, labels=0, ticklabels=1, **kws)
-    ax = dobs.plot(ax=ax, labels=0, ticklabels=1, **kwsd)
-    #     plt.xticks([529000,531000], [529,531])
-    #     plt.yticks([165000,167000], [165,167])
-    add_subfigure_label(ax, 'c', pos='tl')
-    # --------------------------------
-    ax = fig.add_subplot(gs[-1,1])
-    ax.axis('off')
-    cax = ax.inset_axes([0.08, 0., .85, .3])
-    fig.colorbar(dobs.sc, ax=ax, cax=cax, location='bottom', orientation='horizontal',
-                    label='Concentration (ng/l)')
-    from matplotlib.ticker import ScalarFormatter
-    cax.xaxis.set_major_formatter(ScalarFormatter())
-    # --------------------------------
-    ax = fig.add_subplot(gs[:,2])
-    clusters.plot_boxplot(chem, ax=ax)
-    ax.xaxis.set_major_formatter(ScalarFormatter())
-    ax.grid(None)
-    add_subfigure_label(ax, 'd', pos=[.06, .99], c='k')
-    # --------------------------------
-    i = 1
-    for cid, clu in clusters.dict.items():
-        ax = fig.add_subplot(gs[-i,3])
-        if i == 10:
-            add_subfigure_label(ax, 'e', pos=[-.25, .999], c='k')
-        xtick_labels = True if i == 1 else False
-        ytick_labels = True if i == 5 else False
-        ylabel = True if i == 5 else False    
-        clu.plot_conc(chem, dates, ax=ax, xtick_labels=xtick_labels, decimate_xticklabels=2,
-                          ytick_labels=ytick_labels, ylim=(.1,3.), ylabel=ylabel)
-        i += 1
+# def plot_multichem(chem):
+#   def add_subfigure_label(ax, label, pos='tl', fontsize=20, c='w'):
+#       y2 = 0.98
+#       if pos == 'tl':
+#         pos = [0.03, y2]
+#       elif pos == 'tr':
+#         pos = [y2, y2]
+#       elif pos == 'br':
+#         pos = [y2, 0.08]
+#       elif pos == 'bl':
+#         pos = [0.03, 0.08]
+#       else:
+#         pass
+#       ax.text(*pos, label, transform=ax.transAxes, c=c,
+#               fontsize=fontsize, va='top')
+#       return ax
+#     kws = dict(samples=0, graph=0, catch=1, rivers=0, wtws=0, drain=1, csos=0)
+#     kwsd = dict(column=chem, vmin=cmin, vmax=cmax, rotate_ylabels=1, 
+#                 s=400, marker='o', zorder=15,
+#                 annotate='id', annotate_kw=dict(c='w', xytext=(0,-3)),)
+#     fig = plt.figure(figsize=(13,7))
+#     gs = gridspec.GridSpec(10,4, width_ratios=[2,1.4,1,0.5])
+#     # --------------------------------
+#     ax = fig.add_subplot(gs[:,0])
+#     ax = ps.plot(ax=ax, **kws)
+#     ax = dobs.plot(ax=ax, **kwsd)
+#     Domain(*Geospatial().get_extent_zoom(*zoom1)).plot(ax=ax, c='w')
+#     Domain(*Geospatial().get_extent_zoom(*zoom2)).plot(ax=ax, c='w')
+#     add_subfigure_label(ax, 'a', pos=[0.03, 0.99])
+#     # --------------------------------
+#     ax = fig.add_subplot(gs[:4,1])
+#     ax = ps.plot(ax=ax, zoom=zoom1, labels=0, ticklabels=1, **kws)
+#     ax = dobs.plot(ax=ax, labels=0, ticklabels=1, **kwsd)
+#     #     plt.xticks([525000,527000], [525,527])
+#     #     plt.yticks([173000,175000], [173,175])
+#     add_subfigure_label(ax, 'b', pos='tl')
+#     # --------------------------------
+#     ax = fig.add_subplot(gs[5:-1,1])
+#     ax = ps.plot(ax=ax, zoom=zoom2, labels=0, ticklabels=1, **kws)
+#     ax = dobs.plot(ax=ax, labels=0, ticklabels=1, **kwsd)
+#     #     plt.xticks([529000,531000], [529,531])
+#     #     plt.yticks([165000,167000], [165,167])
+#     add_subfigure_label(ax, 'c', pos='tl')
+#     # --------------------------------
+#     ax = fig.add_subplot(gs[-1,1])
+#     ax.axis('off')
+#     cax = ax.inset_axes([0.08, 0., .85, .3])
+#     fig.colorbar(dobs.sc, ax=ax, cax=cax, location='bottom', orientation='horizontal',
+#                     label='Concentration (ng/l)')
+#     from matplotlib.ticker import ScalarFormatter
+#     cax.xaxis.set_major_formatter(ScalarFormatter())
+#     # --------------------------------
+#     ax = fig.add_subplot(gs[:,2])
+#     clusters.plot_boxplot(chem, ax=ax)
+#     ax.xaxis.set_major_formatter(ScalarFormatter())
+#     ax.grid(None)
+#     add_subfigure_label(ax, 'd', pos=[.06, .99], c='k')
+#     # --------------------------------
+#     i = 1
+#     for cid, clu in clusters.dict.items():
+#         ax = fig.add_subplot(gs[-i,3])
+#         if i == 10:
+#             add_subfigure_label(ax, 'e', pos=[-.25, .999], c='k')
+#         xtick_labels = True if i == 1 else False
+#         ytick_labels = True if i == 5 else False
+#         ylabel = True if i == 5 else False    
+#         clu.plot_conc(chem, dates, ax=ax, xtick_labels=xtick_labels, decimate_xticklabels=2,
+#                           ytick_labels=ytick_labels, ylim=(.1,3.), ylabel=ylabel)
+#         i += 1
 
 
 # def plot_data_multichem(chem: str, figsize=(13,7), width_ratios=[2,1,1,0.5]):
