@@ -12,5 +12,6 @@ def process_data_samples(data_samples, drainage, params):
       samples.snap_to_drainage(drainage, thresh=params.thresh)
       samples.create_sample_graph(drainage.fname)
       samples.rename_based_on_topology(use_letters=params.use_letters)
+      samples.create_sample_graph(drainage.fname) # to rename
     clusters.update_ids(means.df)
     return means, sigms, clusters

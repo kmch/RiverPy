@@ -1,3 +1,5 @@
+from autologging import logged, traced
+
 # import sys
 # sys.path.append('..') # to access plotea
 from plotea.mpl2d import Shade #TODO
@@ -12,6 +14,64 @@ import pandas as pd
 import xarray as xr
 import geopandas as gpd
 import rasterio
+
+@traced
+@logged
+def plot_sweep_of_regularizer_strength(sample_network, element_data,
+    min_: float,
+    max_: float,
+    trial_num: float,
+    plot = True) -> [list, list]:
+    """
+    THIS IS A FUNCTION COPIED FROM fasterunmixer SLIGHTLY MODIFIED.
+
+    Plot a sweep of regularization strengths and their impact on roughness and data misfit.
+
+    Args:
+        sample_network (nx.DiGraph): The network of sample sites along the drainage, with associated data.
+        element_data (ElementData): Dictionary of element data.
+        min_ (float): The minimum exponent for the logspace range of regularization strengths to try.
+        max_ (float): The maximum exponent for the logspace range of regularization strengths to try.
+        trial_num (float): The number of regularization strengths to try within the specified range.
+
+    Note:
+        The function performs a sweep of regularization strengths within a specified logspace range and plots their
+        impact on the roughness and data misfit of the sample network. For each regularization strength value, it
+        solves the sample network problem using the specified solver ("ecos") and the corresponding regularization
+        strength. It then calculates the roughness and data misfit values using the network's `get_roughness()` and
+        `get_misfit()` methods, respectively.
+
+        The roughness and data misfit values are plotted as a scatter plot, with the regularization strength value
+        displayed as text next to each point. The x-axis represents the roughness values, and the y-axis represents the
+        data misfit values.
+
+        The function also prints the roughness and data misfit values for each regularization strength value.
+
+        Finally, the function displays the scatter plot with appropriate axis labels.
+
+    Returns:
+        None
+    """
+    vals = np.logspace(min_, max_, num=trial_num)  # regularizer strengths to try
+    rough, misf = [], []
+    for val in vals:
+        # plot_sweep_of_regularizer_strength._log.info(20 * "_")
+        plot_sweep_of_regularizer_strength._log.info("Trying regularizer strength: 10^ %s" %round(np.log10(val), 3))
+        _ = sample_network.solve(element_data, solver="ecos", regularization_strength=val)
+        roughness = sample_network.get_roughness()
+        misfit = sample_network.get_misfit()
+        rough.append(roughness)
+        misf.append(misfit)
+        # plot_sweep_of_regularizer_strength._log.info("Roughness:", np.round(roughness, 4))
+        # plot_sweep_of_regularizer_strength._log.info("Data misfit:", np.round(misfit, 4))
+        if plot:
+          plt.scatter(roughness, misfit, c="grey")
+          plt.text(roughness, misfit, str(round(np.log10(val), 3)))
+          plt.xlabel("Roughness")
+          plt.ylabel("Data misfit")
+    return vals, rough, misf
+
+
 
 
 # def snap_a_point_to_drainage(x, y, drainage, thresh=1e7):  

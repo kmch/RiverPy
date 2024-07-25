@@ -24,7 +24,7 @@ from plotea.mpl2d import *
 from riverpy.coords import convert_xy_to_ij
 from riverpy.input import *
 from riverpy.solver import SolverForwardFunmixer #, SolverInverseFunmixer #FIXME
-from riverpy.utils import sort
+from riverpy.utils import sort, plot_sweep_of_regularizer_strength
 # import sys
 # sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch') 
 # sys.path.append('/Users/kmc3817/postdoc/alex/faster-unmixer-kmch/build') 
@@ -119,7 +119,8 @@ class Inversion:
     self.code = code
     if code == 'faster-unmixer':
       self.problem = snu.SampleNetworkUnmixer(sample_network=acquisition.network,
-                                   continuous=False, use_regularization=use_regularization)
+                                  #  continuous=False,\ # no longer a parameter
+                                   use_regularization=use_regularization)
     else:
       raise NotImplementedError('code: %s' %code)
   def get_fluxes(self, flow_rates: dict, unit='kg/year'):
@@ -157,8 +158,11 @@ class Inversion:
     return vals, misfits
   def get_misfit_vs_rough(self, chem, min_log=-5, max_log=-1, n=11, plot=True):
     dobs = self._select_data(chem, self.data.df)
-    vals, rough, misf = snu.plot_sweep_of_regularizer_strength(self.problem, \
+    vals, rough, misf = plot_sweep_of_regularizer_strength(self.problem, \
       dobs, min_log, max_log, n, plot=plot)
+    
+    # snu.plot_sweep_of_regularizer_strength(self.problem, \
+    #   dobs, min_log, max_log, n, plot=plot)
     self.lcurve = [vals, rough, misf]
     return self.lcurve
   def plot(self, *args, **kwargs):
@@ -369,13 +373,19 @@ class Inversion:
     # plt.xlim(x1,x2)
     # plt.ylim(y1,y2)
     return ax
-  def run(self, chem, regularization_strength, solver='ecos', verbose=False, \
+  def run(self, chem, regularization_strength, solver='ecos', #verbose=False,
+   \
     **kwargs):
     self.regul_strength = regularization_strength
     self.chem = chem
     self.dobs = self._select_data(chem, self.data.df)
-    dsyn, mfinal = self.problem.solve(self.dobs, export_rates=self.exrates, \
-      regularization_strength=regularization_strength, solver=solver, verbose=verbose)
+    solution = self.problem.solve(self.dobs, export_rates=self.exrates, \
+      regularization_strength=regularization_strength, solver=solver, )
+      # verbose=verbose)
+
+    mfinal = solution.upstream_preds
+    dsyn = solution.downstream_preds
+    
     self.dsyn = Data(self.acquisition, dsyn)
     self.mfinal = ModelUnmix(self.acquisition.network, self.exrates, mfinal, self.extent)
     # Checked that indeed dsyn_calc = dsyn (ALL GOOD)
@@ -573,7 +583,7 @@ class InversionMC(Inversion):
     return ax
   def plot_all(self, vmin, vmax, figsize=(12,10), alpha=.5, mode='multicolor',\
      field_data=None, mtrue=None, vmin_std=None, vmax_std=None, title=False,\
-      annotate_lcurve=False):
+      annotate_lcurve=False, insets=True):
     
     x0 = 0.03
     
@@ -655,11 +665,12 @@ class InversionMC(Inversion):
     self.mfinal.plot(ax=ax5, vmin=vmin, vmax=vmax, cmap=cmap, cbar=0)
     self.dsyn.plot(ax=ax5, vmin=vmin, vmax=vmax, cmap=cmap, cbar=0,\
       annotate=None, annotate_kw=dict(c='w'))
-    axi = self.mfinal.plot_inset(ax=ax5, vmin=vmin, vmax=vmax, cmap=cmap,\
+    if insets:
+      axi = self.mfinal.plot_inset(ax=ax5, vmin=vmin, vmax=vmax, cmap=cmap,\
       **inset_kws)
-    self.dsyn.plot(ax=axi, vmin=vmin, vmax=vmax, cmap=cmap, cbar=0, \
-      annotate=None, annotate_kw=dict(c='k'))
-    AxesFormatter()._adjust(ax=axi, labels=0, ticklabels=0, ticks=0)
+      self.dsyn.plot(ax=axi, vmin=vmin, vmax=vmax, cmap=cmap, cbar=0, \
+        annotate=None, annotate_kw=dict(c='k'))
+      AxesFormatter()._adjust(ax=axi, labels=0, ticklabels=0, ticks=0)
     if True:
       cax = ax5.inset_axes([0.79, 0.3, .05, .4])
       cmap = plt.get_cmap(cmap)
@@ -690,11 +701,12 @@ class InversionMC(Inversion):
     self.mfinalstd.plot(ax=ax6, vmin=vmin_std, vmax=vmax_std, cmap=cmap, cbar=0)
     self.dsyn.plot(ax=ax6, vmin=vmin, vmax=vmax, cmap=cmap_m, cbar=0,\
       annotate=None, annotate_kw=dict(c='k'))
-    axi = self.mfinalstd.plot_inset(ax=ax6, vmin=vmin_std, vmax=vmax_std, cmap=cmap,\
+    if insets:
+      axi = self.mfinalstd.plot_inset(ax=ax6, vmin=vmin_std, vmax=vmax_std, cmap=cmap,\
       **inset_kws)
-    self.dsyn.plot(ax=axi, vmin=vmin, vmax=vmax, cmap=cmap_m, cbar=0,\
-      annotate=None, annotate_kw=dict(c='k'))
-    AxesFormatter()._adjust(ax=axi, labels=0, ticklabels=0, ticks=0)
+      self.dsyn.plot(ax=axi, vmin=vmin, vmax=vmax, cmap=cmap_m, cbar=0,\
+        annotate=None, annotate_kw=dict(c='k'))
+      AxesFormatter()._adjust(ax=axi, labels=0, ticklabels=0, ticks=0)
     if True:
       cax = ax6.inset_axes([0.79, 0.3, .05, .4])
       cmap = plt.get_cmap(cmap)
@@ -847,7 +859,7 @@ class InversionMC(Inversion):
     ax = self.mfinalstd.plot(ax=ax, vmin=vmin_std, vmax=vmax_std, **kwargs)
     ax = self.dsyn.plot(ax=ax, vmin=vmin, vmax=vmax, **kwargs)
     return ax
-  def run(self, chem, regularization_strength, std_is_relative: bool, solver='ecos', n=1000, verbose=False):
+  def run(self, chem, regularization_strength, std_is_relative: bool, solver='ecos', n=1000): #, verbose=False):
     self.regul_strength = regularization_strength
     self.chem = chem
     n = int(n)
@@ -895,8 +907,11 @@ class InversionMC(Inversion):
         if data[id] <= 0:
           data[id] = self.detection_threshold
       self.dobs_ensemble.append(data)
-      dsyn_final, final_model = self.problem.solve(data, export_rates=self.exrates, \
-      regularization_strength=regularization_strength, solver=solver, verbose=verbose)
+      solution = self.problem.solve(data, export_rates=self.exrates, \
+      regularization_strength=regularization_strength, solver=solver,)#verbose=verbose)
+
+      dsyn_final = solution.downstream_preds
+      final_model = solution.upstream_preds
 
       self.dsyn_ensemble.append(dsyn_final)
       self.mfin_ensemble.append(final_model)
