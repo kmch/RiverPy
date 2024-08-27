@@ -5,6 +5,65 @@ including an interface with Alex Lipp's `autocatchment` package.
 """
 import numpy as np
 import xarray as xr
+import iogeo
+import rioxarray
+from rasterio.warp import calculate_default_transform, reproject, Resampling
+import numpy as np
+
+
+
+# def read_hydrosheds(fname:str, lon_min, lon_max, lat_min, lat_max):
+  
+#   xarr = iogeo.read(fname)
+#   xarr = xarr.sel(
+#       x=slice(lon_min, lon_max),
+#       y=slice(lat_max, lat_min)  # Note: latitude is usually in descending order
+#   )  
+def read_hydrosheds(fname: str, lon_min, lon_max, lat_min, lat_max, utm_epsg):
+  xarr = iogeo.read(fname)
+
+  # Clip the data to the desired region
+  xarr = xarr.sel(
+      x=slice(lon_min, lon_max),
+      y=slice(lat_max, lat_min)  # Note: latitude is usually in descending order
+  )
+
+  # Reproject the DataArray
+  # Define the target CRS
+  dst_crs = f'EPSG:{utm_epsg}'
+  
+  # Ensure the DataArray has the CRS and transform
+  xarr.rio.write_crs(xarr.rio.crs, inplace=True)
+
+  # Calculate transform and dimensions for the target CRS
+  transform, width, height = calculate_default_transform(
+      xarr.rio.crs, dst_crs, xarr.sizes['x'], xarr.sizes['y'], *xarr.rio.transform()
+  )
+
+  # Create a new DataArray for the reprojected data
+  reprojected_array = xr.DataArray(
+      np.empty((height, width), dtype=np.float32),
+      dims=['y', 'x'],
+      coords={'y': np.linspace(lat_min, lat_max, height), 'x': np.linspace(lon_min, lon_max, width)}
+  )
+
+  # Perform reprojection
+  reproject(
+      source=xarr.values,
+      destination=reprojected_array.values,
+      src_transform=xarr.rio.transform(),
+      src_crs=xarr.rio.crs,
+      dst_transform=transform,
+      dst_crs=dst_crs,
+      resampling=Resampling.nearest
+  )
+
+  # Update the DataArray with the new CRS and transform
+  reprojected_array.rio.write_crs(dst_crs, inplace=True)
+  reprojected_array.rio.write_transform(transform, inplace=True)
+
+  return reprojected_array
+
 
 
 # def topo

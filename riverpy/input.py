@@ -547,7 +547,6 @@ class DataSamples(Geospatial):
     self.xy = self._create_samples_dict_xy()
     self.list = self._create_samples_list()
     self.dict = self._create_samples_dict()
-    
     self.data_cols = data_cols
   def cluster(self, mode='dbscan', **kwargs):
     """
@@ -781,6 +780,16 @@ class DataSamples(Geospatial):
       'x': 'x_coordinate',
       'y': 'y_coordinate',
     })
+    self.__log.debug('len(df)=%s' % len(df))
+    df.to_csv(fname, sep=' ', index=False)
+  def _export_localities(self, fname='localities.csv'): # NOTE
+    df = self.df.copy()[['id', 'x', 'y']]
+    df = df.sort_values('id', inplace=False)
+    # df.rename(inplace=True, columns={
+    #   'id': 'Sample.Code',
+    #   'x': 'x_coordinate',
+    #   'y': 'y_coordinate',
+    # })
     self.__log.debug('len(df)=%s' % len(df))
     df.to_csv(fname, sep=' ', index=False)
 @logged
@@ -1815,6 +1824,9 @@ class SampleGraph(Geospatial):
     if ax is None:
       fig, ax = plt.subplots(figsize=[5,10])      
     snu.plot_network(self.graph) #TODO transpose?
+
+
+
 @logged
 class Topography(Geospatial):
   def __init__(self, domain):
