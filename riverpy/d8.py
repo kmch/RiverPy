@@ -12,13 +12,7 @@ import numpy as np
 
 
 
-# def read_hydrosheds(fname:str, lon_min, lon_max, lat_min, lat_max):
-  
-#   xarr = iogeo.read(fname)
-#   xarr = xarr.sel(
-#       x=slice(lon_min, lon_max),
-#       y=slice(lat_max, lat_min)  # Note: latitude is usually in descending order
-#   )  
+ 
 def read_hydrosheds(fname: str, lon_min, lon_max, lat_min, lat_max, utm_epsg):
   xarr = iogeo.read(fname)
 
@@ -80,10 +74,9 @@ def extract_d8_subdomain(x1, x2, y1, y2, fname_d8_all, fname_d8,\
   pad_width=10, pad_value=0):
   """
   The output D8 file is readable both by `ac.toolkit.load_d8` 
-  (i.e. `read_geo_file` that it calls) and by `snu.get_sample_graphs`.
+  (i.e. `read_geo_file` that it calls) and by `snu.get_sample_graphs`,
+  however it cannot be open by `xr.open_dataset` any more.
   """
-
-
   # Extract, pad & save to file 
   data_array = xr.open_dataset(fname_d8_all)['z'].sel(x=slice(x1, x2), 
                                                       y=slice(y1, y2))
