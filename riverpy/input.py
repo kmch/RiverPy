@@ -782,7 +782,7 @@ class DataSamples(Geospatial):
     })
     self.__log.debug('len(df)=%s' % len(df))
     df.to_csv(fname, sep=' ', index=False)
-  def _export_localities(self, fname='localities.csv'): # NOTE
+  def _export_localities(self, fname='localities.csv'):
     df = self.df.copy()[['id', 'x', 'y']]
     df = df.sort_values('id', inplace=False)
     # df.rename(inplace=True, columns={

@@ -1106,12 +1106,13 @@ class OED:
     return ds, subs
   def extract_drainage_from_elev(self, extent, fname_inp='../../alex/thames-sewage/input_dir/thames_elev.nc',\
     fname_out='tmp.nc'):
+    from riverpy.hydro import Drain
     self.__log.info('Extracting drainage from elevation.')
     d8 = extract_d8_subdomain(*extent, fname_inp, fname_out, pad_width=10, pad_value=0)
     mg = ac.toolkit.load_topo(fname_out)
     # ac.toolkit.viz_drainage_area(mg)
     # self.mg = mg
-    drain = Drainage()
+    drain = Drain()
     # drain.extract(extent, fname_inp, fname_out, pad_width=10, pad_value=0)
     drain.fname = fname_out
     drain.mg = mg

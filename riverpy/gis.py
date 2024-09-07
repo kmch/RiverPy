@@ -6,6 +6,19 @@ from riverpy.input import Geospatial
 import xarray as xr
 from riverpy.xr import Xarr
 
+class RasterModelGrid:
+  @classmethod
+  def get_extent(cls, grid):
+    ny, nx = grid.shape
+    dx = grid.dx
+    dy = grid.dy
+    x1, y1 = grid.xy_of_lower_left
+
+    # Calculate extent
+    x2 = x1 + (nx - 1) * dx
+    y2 = y1 - (ny - 1) * dy
+
+    return [x1, x2, y1, y2]
 
 @logged
 class DEM(Geospatial):
