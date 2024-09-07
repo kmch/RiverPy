@@ -1,10 +1,11 @@
-from autologging import logged, traced
-import iogeo.api
+from autologging import logged
+import iogeo
+from iogeo.xr import Xarr
 import numpy as np
 from plotea.api import plot_topo
+from riverpy.hydro import Drain
 from riverpy.input import Geospatial
 import xarray as xr
-from riverpy.xr import Xarr
 
 class RasterModelGrid:
   @classmethod
@@ -19,6 +20,12 @@ class RasterModelGrid:
     y2 = y1 - (ny - 1) * dy
 
     return [x1, x2, y1, y2]
+  @classmethod
+  def to_xarray(cls, grid):
+    extent = cls.get_extent(grid)
+    arr = grid.at_node["drainage_area"].reshape(grid.shape)
+    xarr = Xarr.create_from_ndarray(arr, extent)
+    return xarr
 
 @logged
 class DEM(Geospatial):
@@ -26,6 +33,8 @@ class DEM(Geospatial):
   Topography represented as xarray.
 
   """
+  def compute_drainage(self, fname):
+    return Drain().compute_from_dem_netcdf(fname)
   def read_xarr(self, source):
     if isinstance(source, xr.DataArray):
       xarr = source

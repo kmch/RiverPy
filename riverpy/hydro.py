@@ -1,34 +1,37 @@
 from iogeo.api import read
+from iogeo.nc import NetCDF
+# from iogeo.xr import Xarr
 import numpy as np
 from riverpy.gis import RasterModelGrid
-from riverpy.xr import Xarr
 import xarray as xr
-from autocatchments.toolkit import load_d8
-
-class NetCDF4:
-  pass
+from autocatchments.toolkit import load_d8, load_topo
 
 class FlowDirs:
+  def compute_drainage(self, fname):
+    return Drain().compute_from_d8_netcdf(fname)
   def extract(self, x1, x2, y1, y2, fname_inp, fname_out, pad_width=10, pad_value=0):
     """
     Extracts a subdomain from a D8 flow direction file, pads it, 
     and saves as a NetCDF file readable by xarray.
+
+    Notes
+    -----
+    It needs padding.
+    
     """
-    xarr = xr.open_dataset(fname_inp)['z'].sel(x=slice(x1, x2), y=slice(y1, y2))
-    xarr = Xarr.pad(xarr, pad_width, pad_value)
-    dataset = xr.Dataset({"z": xarr})
-    dataset.to_netcdf(fname_out, format='NETCDF4')
+    xarr = NetCDF.extract(x1, x2, y1, y2, fname_inp, fname_out, pad_width, pad_value)
     return xarr
   def read(self, fname):
     return read(fname)
 
 class Drain:
-  def get_from_d8_netcdf(self, fname):
-    grid = load_d8(fname)
-    extent = RasterModelGrid.get_extent(grid)
-    arr = grid.at_node["drainage_area"].reshape(grid.shape)
-    xarr = Xarr.create_from_ndarray(arr, extent)
+  def compute_from_dem_netcdf(self, fname):
+    grid = load_topo(fname) # FIXME: prohibitively slow for thames_elev.nc
+    xarr = RasterModelGrid.to_xarray(grid)
     return xarr
-
+  def compute_from_d8_netcdf(self, fname):
+    grid = load_d8(fname)
+    xarr = RasterModelGrid.to_xarray(grid)
+    return xarr
   def save(self):
     pass

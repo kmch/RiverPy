@@ -1,3 +1,5 @@
+from riverpy.gis import *
+from riverpy.hydro import *
 from riverpy.input import *
 from riverpy.frame import *
 from riverpy.plot import *
