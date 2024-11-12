@@ -7,26 +7,6 @@ from riverpy.hydro import Drain
 from riverpy.input import Geospatial
 import xarray as xr
 
-class RasterModelGrid:
-  @classmethod
-  def get_extent(cls, grid):
-    ny, nx = grid.shape
-    dx = grid.dx
-    dy = grid.dy
-    x1, y1 = grid.xy_of_lower_left
-
-    # Calculate extent
-    x2 = x1 + (nx - 1) * dx
-    y2 = y1 - (ny - 1) * dy
-
-    return [x1, x2, y1, y2]
-  @classmethod
-  def to_xarray(cls, grid):
-    extent = cls.get_extent(grid)
-    arr = grid.at_node["drainage_area"].reshape(grid.shape)
-    xarr = Xarr.create_from_ndarray(arr, extent)
-    return xarr
-
 @logged
 class DEM(Geospatial):
   """

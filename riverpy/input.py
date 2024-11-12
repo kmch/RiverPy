@@ -4,7 +4,6 @@ Define 'magic' column names such as 'id', 'x', 'y', 'lat', 'lon', 'date'
 as global vars. 
 """
 from autologging import logged, traced
-# from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import json
 import matplotlib.pyplot as plt
